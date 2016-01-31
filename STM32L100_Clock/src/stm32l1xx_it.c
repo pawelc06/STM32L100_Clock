@@ -40,6 +40,8 @@
 volatile bool toggleFlag = false;
 extern bool updated;
 extern uint8_t mode; //0 - normal, 1 - hours, 2 - minutes, 3 seconds
+extern uint8_t remoteClickedMode;
+
 extern uint16_t ssTogle;
 volatile uint16_t sample;
 volatile uint8_t i;
@@ -321,10 +323,8 @@ void TIM2_IRQHandler(void) {
 
 		if ((bstateu = (bstateu << 1 & 0xf)
 				| (UP_BUTTON_GPIO_PORT->IDR >> BUTTON_UP & 1)) == 1) {
-			//(STM_EVAL_PBGetState(BUTTON_UP)))== 0){
 
-			// byl zwolniony, teraz jest wcisniety - zmiana stanu LED
-			//LED_PORT->ODR ^= 1 << GREEN_LED_BIT | 1 << BLUE_LED_BIT;
+
 
 			if (mode <= 2)
 				RTC_GetTime(RTC_Format_BCD, &RTC_TimeStructure);
@@ -397,6 +397,8 @@ void TIM2_IRQHandler(void) {
 
 			toggleFlag = !toggleFlag;
 			*/
+			remoteClickedMode = 0;
+
 			return;
 		}
 
@@ -494,8 +496,8 @@ void TIM2_IRQHandler(void) {
 		}
 
 		/*************************************/
-		if ((bstatem = (bstatem << 1 & 0xf)
-				| (MODE_BUTTON_GPIO_PORT->IDR >> BUTTON_MODE & 1)) == 1) {
+		if ((remoteClickedMode == 1) || ((bstatem = (bstatem << 1 & 0xf)
+				| (MODE_BUTTON_GPIO_PORT->IDR >> BUTTON_MODE & 1)) == 1)) {
 
 			mode = (mode + 1) % 7;
 
@@ -503,13 +505,6 @@ void TIM2_IRQHandler(void) {
 				displayDate();
 
 
-			/*
-			if((mode == 3)){
-				ssTogle = 1;
-				//updated = true;
-				displayTime();
-			}
-			*/
 
 
 
@@ -520,7 +515,7 @@ void TIM2_IRQHandler(void) {
 			 }
 
 			 toggleFlag = !toggleFlag;
-
+			 remoteClickedMode = 0;
 			return;
 		}
 		/**************************************/

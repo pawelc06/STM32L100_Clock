@@ -38,6 +38,7 @@ extern bool updateDate;
 #define SPIv_ClrClk()	GPIO_ResetBits(GPIOB,GPIO_Pin_13)
 
 volatile u8 mode = 0;
+volatile u8 remoteClickedMode = 0;
 
 
 //uint8_t Red, Green, Blue;
