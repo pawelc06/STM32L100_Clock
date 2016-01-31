@@ -8,17 +8,7 @@
 
 extern bool updateDate;
 
-/******************** (C) COPYRIGHT 2011 ÉÁŇ«µç×ÓÇ¶ČëĘ˝żŞ·˘ą¤×÷ĘŇ ********************
-//ÉîŰÚTFTŇşľ§ÄŁ×éĹú·˘
-//×¨×˘Ňşľ§Ĺú·˘
-//Č«łĚĽĽĘőÖ§łÖ
-//Tel:15989313508
-//QQŁş573355510
-//ĚÔ±¦ÍřµęµŘÖ·Łşmytft.taobao.com
-//ČČłĎ»¶Ó­ÄúµÄąâÁŮ~Łˇ
-/***************************************************************/
-//Ňşľ§ĆÁĘýľÝŇý˝ĹËµĂ÷Łş
-//   Ňşľ§ĆÁŇý˝Ĺ       ¶ÔÓ¦ą¦ÄÜ
+
 //  Pin2		CS
 //	Pin3		SCL
 //	Pin4		SDI
@@ -36,17 +26,7 @@ extern bool updateDate;
 //#define LCD_RST     		GPIO_Pin_15	//MCU_PB15 ¶ÔÓ¦--->>TFT --RST
 /***************************************************************/
 
-/***************************************************************/
-//±ľ˛âĘÔłĚĐňą¦ÄÜËµĂ÷Łş
-//1.Č«ĆÁĚîłä˛âĘÔŔýłĚ
-//2.Ó˘ÎÄĎÔĘľ˛âĘÔŔýłĚ
-//3.ÖĐÎÄĎÔĘľ˛âĘÔŔýłĚ
-//4.2D°´ĹĄĎÔĘľ˛âĘÔŔýłĚ
-//5.ĘýÂëąÜ×ÖĚĺĘý×ÖĎÔĘľ˛âĘÔŔýłĚ
-//±¸×˘ŁşÓÉÓÚ±ľČËĘ±ĽäşÜĂ¦Ł¬Î´ĽÓČë´ĄĂţ˛âĘÔşÍÍĽĆ¬ĎÔĘľĘľŔýŁ¬ÓĐĐčŇŞµÄżÍ»§żÉŇÔÁŞĎµÎŇ
 
-//¸řÓč·˘ËÍĆäËűŇşľ§ÄŁżéÉĎĂćËůÓĂµÄ´ĄĂţŔýłĚşÍÍĽĆ¬ĎÔĘľĘľŔý×÷ÎŞ˛ÎżĽŁ¬Đ»Đ»Ŕí˝âˇŁ
-/***************************************************************/
 
 //------------------------ioÄŁÄâspi˛ż·Ö---------------------------
 // PB6-MOSI
@@ -140,22 +120,7 @@ void Draw_bk_pixel() {
 	Lcd_WriteData(bkColor);
 }
 
-/*
-void put_pixel(int x, int y) {
-	y+=frame_ptr;
-	Set_active_window(x, y, x, y);
-	Write_command( 0x2c );
-	Draw_pixel();
-}
 
-void put_bk_pixel(int x, int y) {
-	y+=frame_ptr;
-	Set_active_window(x, y, x, y);
-	Write_command( 0x2c );
-	Draw_bk_pixel();
-}
-
-*/
 
 void tft_bitmap( int x, int y,  uint8_t * glyph, int width, int height  ) {
 
@@ -178,21 +143,7 @@ void tft_bitmap( int x, int y,  uint8_t * glyph, int width, int height  ) {
 			Draw_pixel();
 		}
 
-	/*
-	uint8_t cred, cgreen, cblue;
-	uint16_t idx=0;
-    y+=frame_ptr;
-	Set_active_window(x, y, x+width-1, y+height-1);
-	Write_command(0x2c);
 
-	while( idx < width*height*3 ) {
-		cred = pgm_read_byte( &glyph[ idx++ ] );
-		cgreen = pgm_read_byte( &glyph[ idx++  ] );
-		cblue = pgm_read_byte( &glyph[ idx++  ] );
-		Set_color(cred, cgreen, cblue);
-		Draw_pixel();
-	}
-	*/
 
 
 
@@ -217,7 +168,7 @@ u8 SPIv_WriteByte(u8 Byte)
 	return Read;
 }
 
-//ÓĂiożÚÄŁÄâµÄspiłőĘĽ»Ż
+
 void SPIv_Init(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
@@ -259,30 +210,14 @@ void SPIv_Init(void)
 	  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_40MHz;
 	  GPIO_Init(LCD_CTRL, &GPIO_InitStructure);
 
-	/*
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO|RCC_APB2Periph_GPIOB, ENABLE);
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_14;  //PB7-MISO
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;  
-	GPIO_Init(GPIOB, &GPIO_InitStructure);  
-
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15;  //PB6-MOSI
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_Init(GPIOB, &GPIO_InitStructure);
 	
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11| GPIO_Pin_12| GPIO_Pin_10 | GPIO_Pin_13;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-	GPIO_Init(GPIOB, &GPIO_InitStructure);
-	*/
 
 }
 
 
 
 
-//spi Đ´Ň»¸ö×Ö˝Ú
+
 u8 SPI_WriteByte(SPI_TypeDef* SPIx,u8 Byte)
 {
 	while((SPIx->SR&SPI_I2S_FLAG_TXE)==RESET);		//µČ´ý·˘ËÍÇřżŐ
@@ -291,8 +226,7 @@ u8 SPI_WriteByte(SPI_TypeDef* SPIx,u8 Byte)
 	return SPIx->DR;          	     //·µ»ŘĘŐµ˝µÄĘýľÝ
 } 
 
-//ÉčÖĂSPIµÄËŮ¶Č
-//SpeedSet:1,¸ßËŮ;0,µÍËŮ;
+
 void SPI_SetSpeed(SPI_TypeDef* SPIx,u8 SpeedSet)
 {
 	SPIx->CR1&=0XFFC7;
@@ -330,10 +264,7 @@ void SPI2_Init(void)
 	    delay_ms( 15 );
 	    RCC->APB1RSTR &= ~RCC_APB1RSTR_SPI2RST;
 	 
-		/*
-	    SPI2->CR1 |= SPI_CR1_MSTR | SPI_CR1_SSM | SPI_CR1_SSI | SPI_CR1_CPHA | SPI_CR1_CPOL | SPI_CR1_BR_0;
-	    SPI2->CR1 |= SPI_CR1_SPE;
-	    */
+
 
 	    SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
 	    	SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
@@ -351,22 +282,15 @@ void SPI2_Init(void)
 
 	    	SPI_Cmd(SPI2, ENABLE);
 
-	//uint16_t afr = GPIOB->AFR[1];
-	//uint16_t cr1 = SPI2->CR1;
+
 
 }
 
-/****************************************************************************
-* Ăű    łĆŁşvoid ili9220B_WriteIndex(u16 idx)
-* ą¦    ÄÜŁşĐ´ ili9220B żŘÖĆĆ÷ĽÄ´ćĆ÷µŘÖ·
-* ČëżÚ˛ÎĘýŁşidx   ĽÄ´ćĆ÷µŘÖ·
-* łöżÚ˛ÎĘýŁşÎŢ
-* Ëµ    Ă÷Łşµ÷ÓĂÇ°ĐčĎČŃˇÖĐżŘÖĆĆ÷Ł¬ÄÚ˛żşŻĘý
-****************************************************************************/
+
 void Lcd_WriteIndex(u8 Index)
 {
    u8 i=0;
-   //SPI Đ´ĂüÁîĘ±ĐňżŞĘĽ
+
    LCD_CS_CLR;
    LCD_RS_CLR;
 
@@ -382,13 +306,7 @@ void Lcd_WriteIndex(u8 Index)
    LCD_CS_SET;
 }
 
-/****************************************************************************
-* Ăű    łĆŁşvoid ili9220B_WriteData(u16 dat)
-* ą¦    ÄÜŁşĐ´ ili9220B ĽÄ´ćĆ÷ĘýľÝ
-* ČëżÚ˛ÎĘýŁşdat     ĽÄ´ćĆ÷ĘýľÝ
-* łöżÚ˛ÎĘýŁşÎŢ
-* Ëµ    Ă÷ŁşĎňżŘÖĆĆ÷Ö¸¶¨µŘÖ·Đ´ČëĘýľÝŁ¬µ÷ÓĂÇ°ĐčĎČĐ´ĽÄ´ćĆ÷µŘÖ·Ł¬ÄÚ˛żşŻĘý
-****************************************************************************/
+
 void Lcd_WriteData(u8 Data)
 {
    u8 i=0;
@@ -883,12 +801,7 @@ void setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
   Lcd_WriteIndex(ILI9341_RAMWR); // write to RAM
 }
 
-/*************************************************
-şŻĘýĂűŁşLCD_Set_XY
-ą¦ÄÜŁşÉčÖĂlcdĎÔĘľĆđĘĽµă
-ČëżÚ˛ÎĘýŁşxy×ř±ę
-·µ»ŘÖµŁşÎŢ
-*************************************************/
+
 void Lcd_SetXY(u16 x,u16 y)
 {
   	Lcd_WriteIndex(0x2a);
@@ -900,12 +813,7 @@ void Lcd_SetXY(u16 x,u16 y)
 }
 
 	
-/*************************************************
-şŻĘýĂűŁşLCD_DrawPoint
-ą¦ÄÜŁş»­Ň»¸öµă
-ČëżÚ˛ÎĘýŁşÎŢ
-·µ»ŘÖµŁşÎŢ
-*************************************************/
+
 void Gui_DrawPoint(u16 x,u16 y,u16 Data)
 {
 	Lcd_SetRegion(x,y,x,y);
@@ -914,10 +822,7 @@ void Gui_DrawPoint(u16 x,u16 y,u16 Data)
 
 }    
 
-/*****************************************
- şŻĘýą¦ÄÜŁş¶ÁTFTÄłŇ»µăµÄŃŐÉ«
- łöżÚ˛ÎĘýŁşcolor  µăŃŐÉ«Öµ
-******************************************/
+
 unsigned int Lcd_ReadPoint(u16 x,u16 y)
 {
   unsigned int Data=0;
@@ -928,12 +833,7 @@ unsigned int Lcd_ReadPoint(u16 x,u16 y)
   Lcd_WriteData(Data);
   return Data;
 }
-/*************************************************
-şŻĘýĂűŁşLcd_Clear
-ą¦ÄÜŁşČ«ĆÁÇĺĆÁşŻĘý
-ČëżÚ˛ÎĘýŁşĚîłäŃŐÉ«COLOR
-·µ»ŘÖµŁşÎŢ
-*************************************************/
+
 void Lcd_Clear(u16 Color)               
 {	
    unsigned int i,m;
@@ -1432,20 +1332,16 @@ void LCD_Write_TimeBCD2(u16 xpos,u16 ypos,RTC_TimeTypeDef * RTC_TimeStructure1)
 
 		xpos = xpos + short_break;
 		if (blink) {
-			//Gui_DrawFont_Num32(xpos,ypos,RED,GRAY0,15);
+
 
 			tft_puts(xpos, ypos, "  ", color, bkColor);
 
 		} else {
-			//Gui_DrawFont_Num32(xpos,ypos,RED,GRAY0,datas[0]);
+
 
 			tft_puts(xpos, ypos, datam, color, bkColor);
 
-			//xpos = xpos+short_break;
 
-			//Gui_DrawFont_Num32(xpos,ypos,RED,GRAY0,datas[1]);
-			//tft_puts(xpos,ypos, datas[1], red, bkColor);
-			//xpos = xpos+4*short_break;
 
 		}
 		break;

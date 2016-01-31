@@ -265,7 +265,7 @@ int main(void) {
 	NEC_Init();
 
 
-	fresult = f_mount(&g_sFatFs, "0:0", 1);
+	//fresult = f_mount(&g_sFatFs, "0:0", 1);
 
 	//LCD_BMP("kasia.bmp");
 
@@ -280,7 +280,7 @@ int main(void) {
 	//playWav("bj8.wav"); // fsamp 44100 Hz, 8 bit
 	//playWav("im16.wav");  // fsamp 44100 Hz, 16 bit
 
-	playWavFromIntMemory(rooster3);
+	//playWavFromIntMemory(rooster3);
 
 
 	displayDate();
@@ -510,19 +510,11 @@ static void RTC_AlarmConfig(void) {
 
 void NEC_ReceiveInterrupt(NEC_FRAME f) {
 	GPIO_ToggleBits(GPIOD, GPIO_Pin_7);
-	char buf[12];
-	/*
-	USART_WriteString("NEC Frame was received : \r\nAddress : ");
-	Int2Str(buf, f.Address);
-	USART_WriteString(buf);
-	USART_WriteString("\r\nCommand : ");
-	Int2Str(buf, f.Command);
-	USART_WriteString(buf);
-	USART_WriteString("\r\n");
-*/
 
 
-	//tft_putint(0, 0,f.Command , white, black);
+
+	setCurrentFont(&Verdana26ptFontInfo);
+	tft_putint(0, 0,f.Command , white, black);
 
 	switch (f.Command) {
 
@@ -538,11 +530,11 @@ void NEC_ReceiveInterrupt(NEC_FRAME f) {
 		GPIO_ToggleBits(GPIOC, GPIO_Pin_9);
 		mode = (mode +1)%7;
 		break;
-		/*
+
 	case 8:
-		GPIO_ToggleBits(GPIOD, GPIO_Pin_15);
+		GPIO_ToggleBits(GPIOD, GPIO_Pin_9);
 		break;
-		*/
+
 	}
 
 }
