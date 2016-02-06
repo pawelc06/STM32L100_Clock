@@ -39,6 +39,8 @@ extern bool updateDate;
 
 volatile u8 mode = 0;
 volatile u8 remoteClickedMode = 0;
+volatile u8 remoteClickedUp = 0;
+volatile u8 remoteClickedDown = 0;
 
 
 //uint8_t Red, Green, Blue;

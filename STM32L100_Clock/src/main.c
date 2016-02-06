@@ -61,7 +61,7 @@ GPIO_InitTypeDef GPIO_InitStructure;
 //void Delayms(__IO uint32_t nCount);
 
 extern day;
-extern volatile mode,remoteClickedMode;
+extern volatile u8 mode,remoteClickedMode,remoteClickedUp,remoteClickedDown;
 
 unsigned char Num[10] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 volatile bool updated = false;
@@ -514,7 +514,7 @@ static void RTC_AlarmConfig(void) {
 void NEC_ReceiveInterrupt(NEC_FRAME f) {
 	//GPIO_ToggleBits(GPIOD, GPIO_Pin_7);
 
-	if(remoteClickedMode == 1) //to avoid multiple switches
+	if(remoteClickedMode || remoteClickedUp || remoteClickedDown) //to avoid multiple switches
 		return;
 
 
@@ -524,11 +524,13 @@ void NEC_ReceiveInterrupt(NEC_FRAME f) {
 
 	switch (f.Command) {
 
-	case 12:
-		GPIO_ToggleBits(GPIOC, GPIO_Pin_8);
+	case 71:
+		remoteClickedUp = 1;
+		GPIO_ToggleBits(GPIOC, GPIO_Pin_9);
 
 		break;
-	case 24:
+	case 69:
+		remoteClickedDown=1;
 		GPIO_ToggleBits(GPIOC, GPIO_Pin_9);
 		break;
 
@@ -539,9 +541,7 @@ void NEC_ReceiveInterrupt(NEC_FRAME f) {
 
 		break;
 
-	case 8:
-		GPIO_ToggleBits(GPIOD, GPIO_Pin_9);
-		break;
+
 	default:
 		break;
 
