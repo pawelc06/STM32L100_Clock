@@ -219,12 +219,16 @@ void SPIv_Init(void)
 
 
 
-u8 SPI_WriteByte(SPI_TypeDef* SPIx,u8 Byte)
+void SPI_WriteByte(SPI_TypeDef* SPIx,u8 Byte)
 {
-	while((SPIx->SR&SPI_I2S_FLAG_TXE)==RESET);		//µČ´ý·˘ËÍÇřżŐ
-	SPIx->DR=Byte;	 	//·˘ËÍŇ»¸öbyte
-	while((SPIx->SR&SPI_I2S_FLAG_RXNE)==RESET);//µČ´ý˝ÓĘŐÍęŇ»¸öbyte
-	return SPIx->DR;          	     //·µ»ŘĘŐµ˝µÄĘýľÝ
+	//while((SPIx->SR&SPI_I2S_FLAG_TXE)==RESET);
+	SPIx->DR=Byte;
+	//while((SPIx->SR&SPI_I2S_FLAG_RXNE)==RESET);
+	//return SPIx->DR;
+
+	//while (SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_TXE) == RESET);
+	//  SPI_I2S_SendData(SPIx, Byte);
+
 } 
 
 
@@ -948,7 +952,7 @@ char Read_Register(char Addr, char xParameter)
 		}
     //tt = spi_xfer(SPI2, Addr)
 
-    tt = SPI_WriteByte(SPI2, Addr);
+    //tt = SPI_WriteByte(SPI2, Addr);
 
 		//while (!(SPI_SR(SPI2) & SPI_SR_RXNE));
     //TFT_DC_HIGH;
@@ -958,7 +962,7 @@ char Read_Register(char Addr, char xParameter)
 			__asm__("NOP");
 		}
     //tt =  SPI_DR(SPI2);
-    tt = SPI2->DR;
+   // tt = SPI2->DR;
 
     tt = spi_readwrite(SPI2, 0);
     //tt = SPI_WriteByte(SPI2, 0);
@@ -1296,7 +1300,7 @@ void LCD_Write_TimeBCD2(u16 xpos,u16 ypos,RTC_TimeTypeDef * RTC_TimeStructure1)
 		}
 
 		xpos = xpos + 2 * short_break;
-		tft_puts(xpos, ypos, colon, color, bkColor);
+		//tft_puts(xpos, ypos, colon, color, bkColor);
 		xpos = xpos + short_break;
 
 		if (last_minutes != mm)
@@ -1320,7 +1324,9 @@ void LCD_Write_TimeBCD2(u16 xpos,u16 ypos,RTC_TimeTypeDef * RTC_TimeStructure1)
 			xpos = xpos + 2 * short_break;
 
 		}
-		tft_puts(xpos, ypos, colon, color, bkColor);
+
+		//colon
+		//tft_puts(xpos, ypos, colon, color, bkColor);
 
 		xpos = xpos + short_break;
 		tft_puts(xpos, ypos, datam, color, bkColor);
@@ -1329,7 +1335,8 @@ void LCD_Write_TimeBCD2(u16 xpos,u16 ypos,RTC_TimeTypeDef * RTC_TimeStructure1)
 		tft_puts(xpos, ypos, datah, color, bkColor);
 
 		xpos = xpos + 2 * short_break;
-		tft_puts(xpos, ypos, colon, color, bkColor);
+		//colon
+		//tft_puts(xpos, ypos, colon, color, bkColor);
 
 		xpos = xpos + short_break;
 		if (blink) {
@@ -1359,7 +1366,9 @@ void LCD_Write_TimeBCD2(u16 xpos,u16 ypos,RTC_TimeTypeDef * RTC_TimeStructure1)
 				}
 
 				xpos = xpos + 2 * short_break;
-				tft_puts(xpos, ypos, colon, color, bkColor);
+
+				//colon
+				//tft_puts(xpos, ypos, colon, color, bkColor);
 				xpos = xpos + short_break;
 
 				if (last_minutes != mm)

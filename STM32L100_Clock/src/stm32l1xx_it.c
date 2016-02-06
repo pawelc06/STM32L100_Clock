@@ -496,8 +496,7 @@ void TIM2_IRQHandler(void) {
 		}
 
 		/*************************************/
-		if ((remoteClickedMode == 1) || ((bstatem = (bstatem << 1 & 0xf)
-				| (MODE_BUTTON_GPIO_PORT->IDR >> BUTTON_MODE & 1)) == 1)) {
+		if ( ((bstatem = (bstatem << 1 & 0xf) | (MODE_BUTTON_GPIO_PORT->IDR >> BUTTON_MODE & 1)) == 1)) {
 
 			mode = (mode + 1) % 7;
 

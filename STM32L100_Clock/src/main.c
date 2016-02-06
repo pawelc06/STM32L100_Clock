@@ -184,16 +184,7 @@ int main(void) {
 
 	GPIO_Config();
 	SPI_Config();
-	/*
-	 for(i1=0;i1<TABLE_SIZE;i1++){
-	 buffer[0][i1] = 4*i1;
-	 }
 
-	 for(i1=0;i1<TABLE_SIZE;i1++){
-	 buffer[1][i1] = 2047*sin(currentPhase)+2047;
-	 currentPhase += phaseIncrement;
-	 }
-	 */
 
 	/* Configure LED3 and LED4 on STM32L100C-Discovery */
 	STM_EVAL_LEDInit(LED3);
@@ -210,6 +201,10 @@ int main(void) {
 
 	Lcd_Clear2(BLACK);
 
+//	tft_puts(45, 20, "12:00", white, black);
+	setCurrentFont(&LetsgoDigital60ptFontInfo);
+	tft_puts(139, 0, ":", white, black);
+
 	/* RTC configuration */
 	//RTC_Config();
 	RTC_Config32768Internal();
@@ -217,7 +212,7 @@ int main(void) {
 	/* Configure RTC alarm A register to generate 8 interrupts per 1 Second */
 	RTC_AlarmConfig();
 
-	tft_puts(45, 20, "12:00", white, black);
+
 
 	RCC_ClocksTypeDef RCC_Clocks;
 
@@ -235,6 +230,8 @@ int main(void) {
 
 	//TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+
+
 
 	nvicStructure.NVIC_IRQChannel = TIM2_IRQn;
 	nvicStructure.NVIC_IRQChannelPreemptionPriority = 0;
@@ -367,6 +364,8 @@ static void RTC_Config32768Internal(void) {
 	/* SYSCFG Peripheral clock enable */
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
 
+
+	PWR_VoltageScalingConfig(PWR_VoltageScaling_Range1);
 	PWR_DeInit();
 
 	/* Allow access to RTC */
@@ -390,6 +389,8 @@ static void RTC_Config32768Internal(void) {
 
 	/* Enable the RTC Clock */
 	RCC_RTCCLKCmd(ENABLE);
+
+	RTC_DeInit();
 
 	/* Wait for RTC APB registers synchronisation */
 	RTC_WaitForSynchro();
@@ -440,6 +441,8 @@ static void RTC_Config32768Internal(void) {
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
 
+
+	RTC_WakeUpCmd(DISABLE);
 // RTC Wakeup Configuration
 	RTC_WakeUpClockConfig(RTC_WakeUpClock_CK_SPRE_16bits);
 
@@ -532,11 +535,19 @@ void NEC_ReceiveInterrupt(NEC_FRAME f) {
 	case 70:
 		GPIO_ToggleBits(GPIOC, GPIO_Pin_9);
 		remoteClickedMode = 1;
+		mode = (mode + 1) % 7;
+
+		if ((mode == 0) || (mode ==6))
+			displayDate();
+		remoteClickedMode = 0;
 		break;
 
 	case 8:
 		GPIO_ToggleBits(GPIOD, GPIO_Pin_9);
 		break;
+	default:
+		break;
+
 
 	}
 
