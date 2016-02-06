@@ -512,9 +512,9 @@ static void RTC_AlarmConfig(void) {
 }
 
 void NEC_ReceiveInterrupt(NEC_FRAME f) {
-	GPIO_ToggleBits(GPIOD, GPIO_Pin_7);
+	//GPIO_ToggleBits(GPIOD, GPIO_Pin_7);
 
-	if(!remoteClickedMode) //to avoid multiple switches
+	if(remoteClickedMode == 1) //to avoid multiple switches
 		return;
 
 
@@ -535,11 +535,8 @@ void NEC_ReceiveInterrupt(NEC_FRAME f) {
 	case 70:
 		GPIO_ToggleBits(GPIOC, GPIO_Pin_9);
 		remoteClickedMode = 1;
-		mode = (mode + 1) % 7;
 
-		if ((mode == 0) || (mode ==6))
-			displayDate();
-		remoteClickedMode = 0;
+
 		break;
 
 	case 8:

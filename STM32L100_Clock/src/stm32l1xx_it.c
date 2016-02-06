@@ -318,7 +318,10 @@ void TIM2_IRQHandler(void) {
 		static uint8_t bstated = 0; //ostatnie stany przycisku
 		static uint8_t bstatem = 0; //ostatnie stany przycisku
 
-
+		if(remoteClickedMode){
+			mode = (mode + 1) % 7;
+			remoteClickedMode = 0;
+		}
 
 
 		if ((bstateu = (bstateu << 1 & 0xf)
