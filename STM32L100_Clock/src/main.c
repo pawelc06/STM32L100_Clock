@@ -168,6 +168,7 @@ void SPI_Config(void)
   SPI_InitStructure.SPI_CPHA = SPI_CPHA_2Edge;                      //aktywne zbocze sygnalu taktujacego - 2-gie zbocze
   SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;                         //programowa obsluga linii NSS (CS)
   SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_2;//prescaler szybkosci tansmisji  32MHz/2=16MHz
+  //SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4;//prescaler szybkosci tansmisji  32MHz/4=8 MHz
   SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;                //pierwszy bit w danych najbardziej znaczacy
   SPI_InitStructure.SPI_CRCPolynomial = 7;                          //stopien wielomianu do obliczania sumy CRC
   SPI_Init(SPI1, &SPI_InitStructure);                               //inicjalizacja SPI

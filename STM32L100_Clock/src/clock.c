@@ -17,7 +17,7 @@ void displayTime(){
 
 		RTC_GetTime(RTC_Format_BCD, &RTC_TimeStructure1);
 
-		rtc_time = RTC_TimeStructure1.RTC_Hours;
+		//rtc_time = RTC_TimeStructure1.RTC_Hours;
 
 		LCD_Write_TimeBCD2(45, 0, &RTC_TimeStructure1);
 		//LCD_Write_TimeBCD_On_Background(45, 20, &RTC_TimeStructure1);

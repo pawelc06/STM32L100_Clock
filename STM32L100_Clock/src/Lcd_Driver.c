@@ -116,11 +116,12 @@ void Draw_pixel() {
 
 void Draw_bk_pixel() {
 
-	//SPI_WriteByte(SPI2,(uint8_t)(bkColor>>8));
-	//SPI_WriteByte(SPI2,(uint8_t)bkColor);
 
+/*
 	Lcd_WriteData(bkColor>>8);
 	Lcd_WriteData(bkColor);
+	*/
+	Lcd_WritePixelData(bkColor);
 }
 
 
@@ -221,17 +222,36 @@ void SPIv_Init(void)
 
 
 
-void SPI_WriteByte(SPI_TypeDef* SPIx,u8 Byte)
+inline static void SPI_WriteByte(SPI_TypeDef* SPIx,u8 Byte)
 {
 	//while((SPIx->SR&SPI_I2S_FLAG_TXE)==RESET);
 	SPIx->DR=Byte;
 	//while((SPIx->SR&SPI_I2S_FLAG_RXNE)==RESET);
 	//return SPIx->DR;
+	//return 0;
 
 	//while (SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_TXE) == RESET);
-	//  SPI_I2S_SendData(SPIx, Byte);
+	  //SPI_I2S_SendData(SPIx, Byte);
 
 } 
+
+inline static void SPI_WriteWord(SPI_TypeDef* SPIx,uint16_t Word)
+{
+
+	SPIx->CR1 = SPIx->CR1 & ~(1<<6); //SPE = 0 - disable SPI1
+	//SPIx->CR1 |= B16(00001000,00000000); //DFF = 1 -> 16 bit SPI mode
+	 SPI1->CR1 = SPI1->CR1 | (1<<11); //CPOL = 1
+	SPIx->CR1 = SPI1->CR1 | (1<<6); //SPE = 1
+
+	SPIx->DR=Word;
+
+	SPIx->CR1 = SPIx->CR1 & ~(1<<6); //SPE = 0
+	  SPIx->CR1 = SPIx->CR1 & ~(1<<11); //DFF = 0
+	  SPIx->CR1 = SPIx->CR1 | (1<<6); //SPE = 1
+	//while (SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_TXE) == RESET);
+	  //SPI_I2S_SendData(SPIx, Byte);
+
+}
 
 
 void SPI_SetSpeed(SPI_TypeDef* SPIx,u8 SpeedSet)
@@ -302,6 +322,11 @@ void Lcd_WriteIndex(u8 Index)
    LCD_RS_CLR;
 
    /*
+   __asm__("NOP");
+   __asm__("NOP");
+   */
+
+   /*
    for (i = 0; i < 5; i++) {
    			__asm__("NOP");
    		}
@@ -309,28 +334,123 @@ void Lcd_WriteIndex(u8 Index)
 
 
    SPI_WriteByte(SPI2,Index);
+   /*
+   __asm__("NOP");
+   */
    
+   __asm__("NOP");
+   __asm__("NOP");
+   __asm__("NOP");
+   __asm__("NOP");
+   __asm__("NOP");
+   __asm__("NOP");
+   __asm__("NOP");
+
+   __asm__("NOP");
+   __asm__("NOP");
+
+   __asm__("NOP");
+   __asm__("NOP");
+
+   __asm__("NOP");
+    __asm__("NOP");
+
    LCD_CS_SET;
 }
 
 
-void Lcd_WriteData(u8 Data)
+void  Lcd_WriteData(u8 Data)
 {
    u8 i=0;
+
 
    LCD_RS_SET;
    LCD_CS_CLR;
 
-   /*
-   for ( i = 0; i < 5; i++) {
-   			__asm__("NOP");
-   		}
-*/
+
+//   __asm__("NOP");
+  // __asm__("NOP");
+
+
+
 
    //SPIv_WriteByte(Data);
    SPI_WriteByte(SPI2,Data);
 
 
+   __asm__("NOP");
+   __asm__("NOP");
+   __asm__("NOP");
+   __asm__("NOP");
+   __asm__("NOP");
+   __asm__("NOP");
+   __asm__("NOP");
+
+   __asm__("NOP");
+   __asm__("NOP");
+
+   __asm__("NOP");
+   __asm__("NOP");
+
+   __asm__("NOP");
+    __asm__("NOP");
+
+
+
+   /*
+   for ( i = 0; i < 15; i++) {
+      			__asm__("NOP");
+      		}
+      		*/
+
+
+   LCD_CS_SET;
+}
+
+void  Lcd_WritePixelData(uint16_t Data)
+{
+   u8 i=0;
+
+
+   LCD_RS_SET;
+   LCD_CS_CLR;
+
+
+//   __asm__("NOP");
+  // __asm__("NOP");
+
+
+
+
+   //SPIv_WriteByte(Data);
+   SPI_WriteWord(SPI2,Data);
+
+/*
+   __asm__("NOP");
+   __asm__("NOP");
+   __asm__("NOP");
+   __asm__("NOP");
+   __asm__("NOP");
+   __asm__("NOP");
+   __asm__("NOP");
+
+   __asm__("NOP");
+   __asm__("NOP");
+
+   __asm__("NOP");
+   __asm__("NOP");
+
+   __asm__("NOP");
+   */
+
+
+
+
+   /*
+   for ( i = 0; i < 15; i++) {
+      			__asm__("NOP");
+      		}
+      		*/
 
 
    LCD_CS_SET;
@@ -1105,7 +1225,7 @@ void LCD_Write_Date(u16 xpos,u16 ypos,RTC_DateTypeDef  * RTC_DateStruct)
 
 	case 0:
 	case 1:
-	case 2:
+	case 2: //hours, minutes
 		tft_puts(xpos, ypos, yearStr, white, black);
 		xpos = xpos + 4 * short_break;
 
@@ -1204,28 +1324,13 @@ void LCD_Write_Date(u16 xpos,u16 ypos,RTC_DateTypeDef  * RTC_DateStruct)
 		break;
 
 	case 6: //setting weekday
-		//tft_puts(xpos, ypos, yearStr, white, black);
-				xpos = xpos + 4 * short_break;
-
-				//tft_puts(xpos, ypos, "-", white, black);
-
-				xpos = xpos + short_break;
-
-				//tft_puts(xpos, ypos, mStr, white, black);
-
-				xpos = xpos + 2 * short_break;
-
-				//tft_puts(xpos, ypos, "-", white, black);
-
-				xpos = xpos + short_break;
-
-				//tft_puts(xpos, ypos, dStr, white, black);
-
-				ypos += 32;
-
-				writeWeekDay(xposInit, ypos,RTC_DateStruct,blink);
-
-			break;
+		xpos = xpos + 4 * short_break;
+		xpos = xpos + short_break;
+		xpos = xpos + 2 * short_break;
+		xpos = xpos + short_break;
+		ypos += 32;
+		writeWeekDay(xposInit, ypos,RTC_DateStruct,blink);
+		break;
 	default:
 		break;
 
