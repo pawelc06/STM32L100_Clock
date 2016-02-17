@@ -240,8 +240,8 @@ inline static void SPI_WriteWord(SPI_TypeDef* SPIx,uint16_t Word)
 
 	SPIx->CR1 = SPIx->CR1 & ~(1<<6); //SPE = 0 - disable SPI1
 	//SPIx->CR1 |= B16(00001000,00000000); //DFF = 1 -> 16 bit SPI mode
-	 SPI1->CR1 = SPI1->CR1 | (1<<11); //CPOL = 1
-	SPIx->CR1 = SPI1->CR1 | (1<<6); //SPE = 1
+	 SPIx->CR1 = SPIx->CR1 | (1<<11); //CPOL = 1
+	SPIx->CR1 = SPIx->CR1 | (1<<6); //SPE = 1
 
 	SPIx->DR=Word;
 
