@@ -385,51 +385,6 @@ void tft_puts_on_background( int x, int y, char * s, uint32_t color) {
 
 
 
-void tft_mputs_P( int x, int y, char * s, uint32_t color, uint32_t bk_color ) {
-
-	char c;
-	uint8_t gH, gW, gS, gIS;
-	uint16_t offset;
-	uint8_t startChar = currentFont.startChar;
-	uint8_t * glyph = (uint8_t*)currentFont.data;
-
-
-	Set_color32(color);
-	Set_bk_color32(bk_color);
-
-	//Set_color(color);
-	//Set_bk_color(bk_color);
-
-	gH = currentFont.heightPixels;
-	gIS = currentFont.interspacePixels;
-	gS = currentFont.spacePixels;
-
-	while( (c=s) ) {
-		if( c > ' ') {
-			gW = currentFont.charInfo[ c - startChar  ].widthBits ;
-
-			offset = currentFont.charInfo[ c - startChar  ].offset;
-
-			send_font_bitmap(x, y, glyph+offset, gH, gW );
-			x = x + gW + gIS;
-
-		} else {
-			//Set_active_window(x,y,x+gS-1,y+gH-1);
-			Lcd_SetRegion(x,y,x+gS-1,y+gH-1);
-			//Write_command(0x2c);
-			for(offset=0;offset<gS*gH;offset++) {
-				Draw_bk_pixel();
-				Draw_bk_pixel();
-				Draw_bk_pixel();
-			}
-			x+=gS;
-		}
-		s++;
-	}
-
-	CX=x;
-	CY=y;
-}
 
 int text_len(char *s) {
 
@@ -476,78 +431,6 @@ int text_len_P(char *s) {
 
 
 
-void tft_puts_P( int x, int y, char * s, uint32_t color, uint32_t bk_color ) {
-
-	y+=frame_ptr;
-
-	if( !currentFont.filename ) {
-		tft_mputs_P(x,y, s, color, bk_color);
-		return;
-	}
-#if USE_PETIT_FAT == 0
-	else return;
-#endif
-
-
-#if USE_PETIT_FAT == 1
-	char c;
-	uint8_t gH, gW=0, gS, gIS;
-	uint16_t offset;
-	uint8_t startChar = currentFont.startChar;
-	WORD s1;
-	uint16_t pof;
-
-	char fname1[13];
-	memset(fname1, 0, 13);
-	memcpy_P(fname1, currentFont.filename, strlen_P( currentFont.filename));
-	if( pf_open(fname1) ) return;
-
-	Set_color32(color);
-	Set_bk_color32(bk_color);
-	gH = currentFont.heightPixels;
-	gIS = currentFont.interspacePixels;
-	gS = currentFont.spacePixels;
-
-	pf_lseek(0);
-	pf_read(sd_buf, 2, &s1);
-	pof = (uint16_t)(sd_buf[1]<<8) | (uint16_t)(sd_buf[0]);
-
-
-
-	while( (c=pgm_read_byte(s)) ) {
-		if( c > ' ') {
-
-			pf_lseek( (uint16_t)((c-startChar)*3)+2 );
-			pf_read(sd_buf, 3, &s1);
-			gW = sd_buf[0];
-			if( !gW ) continue;
-			offset = (uint16_t)(sd_buf[2]<<8) | ( (uint16_t)(sd_buf[1] ));
-			offset+=pof;
-
-
-			pf_lseek(offset);
-			pf_read(sd_buf, SD_BUF_SIZE, &s1);
-			send_font_bin(x, y, gH, gW );
-
-
-			x = x + gW + gIS;
-		} else {
-			Set_active_window(x,y,x+gS-1,y+gH-1);
-			Write_command(0x2c);
-			for(offset=0;offset<gS*gH;offset++) {
-				Draw_bk_pixel();
-				Draw_bk_pixel();
-				Draw_bk_pixel();
-			}
-			x+=gS;
-		}
-		s++;
-	}
-
-	CX=x;
-	CY=y;
-#endif
-}
 
 
 void tft_putint(int x, int y, int val, uint32_t pen, uint32_t brush) {

@@ -107,10 +107,10 @@ void Draw_pixel() {
 
 
 
-		Lcd_WriteData(Color>>8);
-		Lcd_WriteData(Color);
+		//Lcd_WriteData(Color>>8);
+		//Lcd_WriteData(Color);
 
-
+		Lcd_WritePixelData(Color);
 
 }
 
@@ -150,85 +150,23 @@ void tft_bitmap( int x, int y,  uint8_t * glyph, int width, int height  ) {
 }
 
 
-u8 SPIv_WriteByte(u8 Byte)
-{
-	u8 i,Read;
-	
-	for(i=8; i; i--)
-	{	
-		SPIv_ClrClk();
-		SPIv_SetData(Byte);	
-		Byte<<=1;
-		SPIv_SetClk();
-		//Read <<= 1;
-		//Read |= SPIv_ReadData();
-	}
-	//SPIv_ClrClk();
-	return Read;
-}
-
-
-void SPIv_Init(void)
-{
-	GPIO_InitTypeDef GPIO_InitStructure;
-	
-
-	 /*************************************/
-	 /*!< SD_SPI_CS_GPIO, SD_SPI_MOSI_GPIO, SD_SPI_MISO_GPIO, SD_SPI_DETECT_GPIO
-	       and SD_SPI_SCK_GPIO Periph clock enable */
-	  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOB , ENABLE);
-
-	  /*!< SD_SPI Periph clock enable */
-	  //RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
-
-
-	  while(RCC_GetSYSCLKSource() != 0x0C);                //odczekaj az PLL bedzie sygnalem zegarowym systemu
-	  	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2 , ENABLE);
-
-	  /*!< Configure SD_SPI pins: SCK */
-	  GPIO_InitStructure.GPIO_Pin = LCD_SCL;
-	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-	  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_40MHz;
-	  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	  GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_UP;
-	  GPIO_Init(LCD_CTRL, &GPIO_InitStructure);
-
-	  /*!< Configure SD_SPI pins: MISO */
-	  GPIO_InitStructure.GPIO_Pin = LCD_SDO;
-	  GPIO_Init(LCD_CTRL, &GPIO_InitStructure);
-
-	  /*!< Configure SD_SPI pins: MOSI */
-	  GPIO_InitStructure.GPIO_Pin = LCD_SDA;
-	  GPIO_Init(LCD_CTRL, &GPIO_InitStructure);
-
-	  /*!< Configure SD_SPI_CS_PIN pin: SD Card CS pin */
-	  GPIO_InitStructure.GPIO_Pin = LCD_CS;
-	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-	  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
-	  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_40MHz;
-	  GPIO_Init(LCD_CTRL, &GPIO_InitStructure);
-
-	
-
-}
 
 
 
 
 
-inline static void SPI_WriteByte(SPI_TypeDef* SPIx,u8 Byte)
+static void __attribute__((optimize("O0"))) SPI_WriteByte(SPI_TypeDef* SPIx,u8 Byte)
 {
 	while (SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_TXE) == RESET);
 	  SPI_I2S_SendData(SPIx, Byte);
 
 } 
 
-static void SPI_WriteWord(SPI_TypeDef* SPIx,uint16_t Word)
+static void __attribute__((optimize("O0"))) SPI_WriteWord(SPI_TypeDef* SPIx,uint16_t Word)
 {
 
 	SPIx->CR1 = SPIx->CR1 & ~(1<<6); //SPE = 0 - disable SPI1
-	SPIx->CR1 = SPIx->CR1 | (1<<11); //CPOL = 1
+	SPIx->CR1 = SPIx->CR1 | (1<<11); //DFF = 1
 	SPIx->CR1 = SPIx->CR1 | (1<<6); //SPE = 1
 
 	//SPIx->DR=Word;
@@ -288,8 +226,8 @@ void SPI2_Init(void)
 	    	SPI_InitStructure.SPI_CPOL = SPI_CPOL_High;
 	    	SPI_InitStructure.SPI_CPHA = SPI_CPHA_2Edge;
 	    	SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
-	    	//SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4; //8MHz
-	    	SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_2; // 16MHz
+	    	SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4; //8MHz
+	    	//SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_2; // 16MHz
 	    	//SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16; //500 kHz
 	    	SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
 	    	SPI_InitStructure.SPI_CRCPolynomial = 7;
@@ -315,34 +253,23 @@ void __attribute__((optimize("O0"))) Lcd_WriteIndex(u8 Index)
    __asm__("NOP");
    */
 
-   /*
-   for (i = 0; i < 5; i++) {
-   			__asm__("NOP");
-   		}
-*/
+
+   for (i = 0; i < 2; i++) {
+         			__asm__("NOP");
+         		}
+
 
 
    SPI_WriteByte(SPI2,Index);
+
+   for (i = 0; i < 2; i++) {
+      			__asm__("NOP");
+      		}
    /*
    __asm__("NOP");
    */
    
-   __asm__("NOP");
-   __asm__("NOP");
-   __asm__("NOP");
-   __asm__("NOP");
-   __asm__("NOP");
-   __asm__("NOP");
-   __asm__("NOP");
 
-   __asm__("NOP");
-   __asm__("NOP");
-
-   __asm__("NOP");
-   __asm__("NOP");
-
-   __asm__("NOP");
-    __asm__("NOP");
 
    LCD_CS_SET;
 }
@@ -361,36 +288,24 @@ void __attribute__((optimize("O0")))  Lcd_WriteData(u8 Data)
   // __asm__("NOP");
 
 
-
+   for (i = 0; i < 2; i++) {
+         			__asm__("NOP");
+         		}
 
    //SPIv_WriteByte(Data);
    SPI_WriteByte(SPI2,Data);
 
 
    __asm__("NOP");
-   __asm__("NOP");
-   __asm__("NOP");
-   __asm__("NOP");
-   __asm__("NOP");
-   __asm__("NOP");
-   __asm__("NOP");
-
-   __asm__("NOP");
-   __asm__("NOP");
-
-   __asm__("NOP");
-   __asm__("NOP");
-
-   __asm__("NOP");
-    __asm__("NOP");
 
 
 
-   /*
-   for ( i = 0; i < 15; i++) {
+
+
+   for ( i = 0; i < 2; i++) {
       			__asm__("NOP");
       		}
-      		*/
+
 
 
    LCD_CS_SET;
@@ -406,6 +321,13 @@ void __attribute__((optimize("O0"))) Lcd_WritePixelData(uint16_t Data)
 
 
    SPI_WriteWord(SPI2,Data);
+
+   //delay_us(1);
+   /*
+   for ( i = 0; i < 2; i++) {
+       			__asm__("NOP");
+       		}
+*/
 
    LCD_CS_SET;
 }
@@ -628,7 +550,7 @@ void Lcd_Init2(void)
 		  LCD_RS_SET;
 
 
-	//SPIv_Init();
+
 	SPI2_Init();
 	Lcd_Reset();
 
@@ -759,13 +681,13 @@ void Lcd_Init2(void)
 
 
 void Lcd_SetRegion(u16 x_start,u16 y_start,u16 x_end,u16 y_end)
-{	
+{
 	Lcd_WriteIndex(0x2a); //column address set
 	Lcd_WriteData16Bit(x_start>>8,x_start);
 	Lcd_WriteIndex(0x2b); // page address set
 	Lcd_WriteData16Bit(y_start>>8,y_start);
 	Lcd_WriteIndex(0x2c); //memory write
-	/*	
+	/*
 	Lcd_WriteIndex(0x50);
 	Lcd_WriteData16Bit(x_start>>8,x_start);
 	Lcd_WriteIndex(0x51);
@@ -854,6 +776,9 @@ void Lcd_Clear(u16 Color)
 		//Lcd_WriteData(Color);
       }   
 	}
+   for (i = 0; i < 5; i++) { /* Wait a bit. */
+   			__asm__("NOP");
+   		}
 	 LCD_CS_SET;
 }
 
