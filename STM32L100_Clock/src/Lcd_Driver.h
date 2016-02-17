@@ -136,5 +136,5 @@ void Lcd_SetRegion(u16 x_start,u16 y_start,u16 x_end,u16 y_end);
 static void SPI_WriteByte(SPI_TypeDef* SPIx,u8 Byte);
 void setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
 void itoa(uint16_t n, uint8_t s[]);
-inline static void SPI_WriteWord(SPI_TypeDef* SPIx,uint16_t Word);
+static void SPI_WriteWord(SPI_TypeDef* SPIx,uint16_t Word);
 void Lcd_WritePixelData(uint16_t bkColor);

@@ -156,6 +156,7 @@ void GPIO_Config(void)
 
 }
 
+
 void SPI_Config(void)
 {
   //konfigurowanie interfejsu SPI
@@ -184,7 +185,9 @@ int main(void) {
 	SystemInit();
 
 	GPIO_Config();
-	SPI_Config();
+
+	//For sd card
+	//SPI_Config();
 
 
 	/* Configure LED3 and LED4 on STM32L100C-Discovery */

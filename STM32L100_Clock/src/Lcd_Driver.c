@@ -116,11 +116,6 @@ void Draw_pixel() {
 
 void Draw_bk_pixel() {
 
-
-/*
-	Lcd_WriteData(bkColor>>8);
-	Lcd_WriteData(bkColor);
-	*/
 	Lcd_WritePixelData(bkColor);
 }
 
@@ -224,32 +219,26 @@ void SPIv_Init(void)
 
 inline static void SPI_WriteByte(SPI_TypeDef* SPIx,u8 Byte)
 {
-	//while((SPIx->SR&SPI_I2S_FLAG_TXE)==RESET);
-	SPIx->DR=Byte;
-	//while((SPIx->SR&SPI_I2S_FLAG_RXNE)==RESET);
-	//return SPIx->DR;
-	//return 0;
-
-	//while (SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_TXE) == RESET);
-	  //SPI_I2S_SendData(SPIx, Byte);
+	while (SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_TXE) == RESET);
+	  SPI_I2S_SendData(SPIx, Byte);
 
 } 
 
-inline static void SPI_WriteWord(SPI_TypeDef* SPIx,uint16_t Word)
+static void SPI_WriteWord(SPI_TypeDef* SPIx,uint16_t Word)
 {
 
 	SPIx->CR1 = SPIx->CR1 & ~(1<<6); //SPE = 0 - disable SPI1
-	//SPIx->CR1 |= B16(00001000,00000000); //DFF = 1 -> 16 bit SPI mode
-	 SPIx->CR1 = SPIx->CR1 | (1<<11); //CPOL = 1
+	SPIx->CR1 = SPIx->CR1 | (1<<11); //CPOL = 1
 	SPIx->CR1 = SPIx->CR1 | (1<<6); //SPE = 1
 
-	SPIx->DR=Word;
+	//SPIx->DR=Word;
+	while (SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_TXE) == RESET);
+		  SPI_I2S_SendData(SPIx, Word);
 
 	SPIx->CR1 = SPIx->CR1 & ~(1<<6); //SPE = 0
-	  SPIx->CR1 = SPIx->CR1 & ~(1<<11); //DFF = 0
-	  SPIx->CR1 = SPIx->CR1 | (1<<6); //SPE = 1
-	//while (SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_TXE) == RESET);
-	  //SPI_I2S_SendData(SPIx, Byte);
+	SPIx->CR1 = SPIx->CR1 & ~(1<<11); //DFF = 0
+	SPIx->CR1 = SPIx->CR1 | (1<<6); //SPE = 1
+
 
 }
 
@@ -314,7 +303,7 @@ void SPI2_Init(void)
 }
 
 
-void Lcd_WriteIndex(u8 Index)
+void __attribute__((optimize("O0"))) Lcd_WriteIndex(u8 Index)
 {
    u8 i=0;
 
@@ -359,7 +348,7 @@ void Lcd_WriteIndex(u8 Index)
 }
 
 
-void  Lcd_WriteData(u8 Data)
+void __attribute__((optimize("O0")))  Lcd_WriteData(u8 Data)
 {
    u8 i=0;
 
@@ -407,7 +396,7 @@ void  Lcd_WriteData(u8 Data)
    LCD_CS_SET;
 }
 
-void  Lcd_WritePixelData(uint16_t Data)
+void __attribute__((optimize("O0"))) Lcd_WritePixelData(uint16_t Data)
 {
    u8 i=0;
 
@@ -416,42 +405,7 @@ void  Lcd_WritePixelData(uint16_t Data)
    LCD_CS_CLR;
 
 
-//   __asm__("NOP");
-  // __asm__("NOP");
-
-
-
-
-   //SPIv_WriteByte(Data);
    SPI_WriteWord(SPI2,Data);
-
-/*
-   __asm__("NOP");
-   __asm__("NOP");
-   __asm__("NOP");
-   __asm__("NOP");
-   __asm__("NOP");
-   __asm__("NOP");
-   __asm__("NOP");
-
-   __asm__("NOP");
-   __asm__("NOP");
-
-   __asm__("NOP");
-   __asm__("NOP");
-
-   __asm__("NOP");
-   */
-
-
-
-
-   /*
-   for ( i = 0; i < 15; i++) {
-      			__asm__("NOP");
-      		}
-      		*/
-
 
    LCD_CS_SET;
 }
@@ -635,86 +589,7 @@ void Lcd_Init(void)
 				
         Lcd_WriteIndex(0x29);    //Display on 
         Lcd_WriteIndex(0x2c); 
-#if 0
-	//************* Start Initial Sequence **********//
-	
-	Lcd_WriteIndex16Bit(0x00,0x01);
-	Lcd_WriteData16Bit(0x01,0x1C); // set SS and NL bit
-	Lcd_WriteIndex16Bit(0x00,0x02);
-	Lcd_WriteData16Bit(0x01,0x00); // set 1 line inversion
-	Lcd_WriteIndex16Bit(0x00,0x03);
-	Lcd_WriteData16Bit(0x10,0x30); // set GRAM write direction and BGR=1.//1030
-	Lcd_WriteIndex16Bit(0x00,0x08);
-	Lcd_WriteData16Bit(0x08,0x08); // set BP and FP
-	Lcd_WriteIndex16Bit(0x00,0x0C);
-	Lcd_WriteData16Bit(0x00,0x00); // RGB interface setting R0Ch=0x0110 for RGB 18Bit and R0Ch=0111for RGB16Bit
-	Lcd_WriteIndex16Bit(0x00,0x0F);
-	Lcd_WriteData16Bit(0x0b,0x01); // Set frame rate//0b01
-	Lcd_WriteIndex16Bit(0x00,0x20);
-	Lcd_WriteData16Bit(0x00,0x00); // Set GRAM Address
-	Lcd_WriteIndex16Bit(0x00,0x21);
-	Lcd_WriteData16Bit(0x00,0x00); // Set GRAM Address
-	//*************Power On sequence ****************//
-	delay_ms(50);                         // Delay 50ms
-	Lcd_WriteIndex16Bit(0x00,0x10);
-	Lcd_WriteData16Bit(0x0a,0x00); // Set SAP,DSTB,STB//0800
-	Lcd_WriteIndex16Bit(0x00,0x11);
-	Lcd_WriteData16Bit(0x10,0x38); // Set APON,PON,AON,VCI1EN,VC
-	delay_ms(50);                  // Delay 50ms
-	Lcd_WriteIndex16Bit(0x00,0x12);
-	Lcd_WriteData16Bit(0x11,0x21); // Internal reference voltage= Vci;
-	Lcd_WriteIndex16Bit(0x00,0x13);
-	Lcd_WriteData16Bit(0x00,0x63); // Set GVDD
-	Lcd_WriteIndex16Bit(0x00,0x14);
-	Lcd_WriteData16Bit(0x4b,0x44); // Set VCOMH/VCOML voltage//3944
-	//------------- Set GRAM area ------------------//
-	Lcd_WriteIndex16Bit(0x00,0x30);
-	Lcd_WriteData16Bit(0x00,0x00);
-	Lcd_WriteIndex16Bit(0x00,0x31);
-	Lcd_WriteData16Bit(0x00,0xDB);
-	Lcd_WriteIndex16Bit(0x00,0x32);
-	Lcd_WriteData16Bit(0x00,0x00);
-	Lcd_WriteIndex16Bit(0x00,0x33);
-	Lcd_WriteData16Bit(0x00,0x00);
-	Lcd_WriteIndex16Bit(0x00,0x34);
-	Lcd_WriteData16Bit(0x00,0xDB);
-	Lcd_WriteIndex16Bit(0x00,0x35);
-	Lcd_WriteData16Bit(0x00,0x00);
-	Lcd_WriteIndex16Bit(0x00,0x36);
-	Lcd_WriteData16Bit(0x00,0xAF);
-	Lcd_WriteIndex16Bit(0x00,0x37);
-	Lcd_WriteData16Bit(0x00,0x00);
-	Lcd_WriteIndex16Bit(0x00,0x38);
-	Lcd_WriteData16Bit(0x00,0xDB);
-	Lcd_WriteIndex16Bit(0x00,0x39);
-	Lcd_WriteData16Bit(0x00,0x00);
-	// ----------- Adjust the Gamma Curve ----------//
-	Lcd_WriteIndex16Bit(0x00,0x50);
-	Lcd_WriteData16Bit(0x00,0x03);
-	Lcd_WriteIndex16Bit(0x00,0x51);
-	Lcd_WriteData16Bit(0x09,0x00);
-	Lcd_WriteIndex16Bit(0x00,0x52);
-	Lcd_WriteData16Bit(0x0d,0x05);
-	Lcd_WriteIndex16Bit(0x00,0x53);
-	Lcd_WriteData16Bit(0x09,0x00);
-	Lcd_WriteIndex16Bit(0x00,0x54);
-	Lcd_WriteData16Bit(0x04,0x07);
-	Lcd_WriteIndex16Bit(0x00,0x55);
-	Lcd_WriteData16Bit(0x05,0x02);
-	Lcd_WriteIndex16Bit(0x00,0x56);
-	Lcd_WriteData16Bit(0x00,0x00);
-	Lcd_WriteIndex16Bit(0x00,0x57);
-	Lcd_WriteData16Bit(0x00,0x05);
-	Lcd_WriteIndex16Bit(0x00,0x58);
-	Lcd_WriteData16Bit(0x17,0x00);
-	Lcd_WriteIndex16Bit(0x00,0x59);
-	Lcd_WriteData16Bit(0x00,0x1F);
-	delay_ms(50);                    // Delay 50ms
-	Lcd_WriteIndex16Bit(0x00,0x07);
-	Lcd_WriteData16Bit(0x10,0x17);
-	Lcd_WriteIndex16Bit(0x00,0x22);		
-	delay_ms(200);
-#endif
+
 
 }
 
@@ -882,12 +757,7 @@ void Lcd_Init2(void)
 }
 
 
-/*************************************************
-şŻĘýĂűŁşLCD_Set_Region
-ą¦ÄÜŁşÉčÖĂlcdĎÔĘľÇřÓňŁ¬ÔÚ´ËÇřÓňĐ´µăĘýľÝ×Ô¶Ż»»ĐĐ
-ČëżÚ˛ÎĘýŁşxyĆđµăşÍÖŐµă,Y_IncMode±íĘľĎČ×ÔÔöyÔŮ×ÔÔöx
-·µ»ŘÖµŁşÎŢ
-*************************************************/
+
 void Lcd_SetRegion(u16 x_start,u16 y_start,u16 x_end,u16 y_end)
 {	
 	Lcd_WriteIndex(0x2a); //column address set
